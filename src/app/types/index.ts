@@ -3,6 +3,8 @@ export type TodoProps = {
   completed: boolean;
   title: string;
   description: string;
+  deadline: string;
+  author: string;
 };
 
 export type TodoCardsProps = {
