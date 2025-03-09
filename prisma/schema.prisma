@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model daily_tip {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  description String   @db.LongText
+  created_at  DateTime @db.DateTime(0)
+  active      Boolean  @default(false)
+}
+
+model roles {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  name       String?  @db.VarChar(500)
+  created_at DateTime @db.DateTime(0)
+}
+
+model status {
+  id            Int      @id @default(autoincrement()) @db.UnsignedInt
+  name          String   @db.VarChar(500)
+  created_at    DateTime @db.DateTime(0)
+  created_by_id Int      @db.UnsignedInt
+  active        Boolean? @default(true)
+}
+
+model todos {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  title        String    @db.VarChar(500)
+  description  String?   @db.LongText
+  author_id    Int       @db.UnsignedInt
+  assign_to_id Int?      @db.UnsignedInt
+  created_at   DateTime  @db.DateTime(0)
+  updated_at   DateTime? @db.DateTime(0)
+  deleted_at   DateTime? @db.DateTime(0)
+  status       Int?      @default(0) @db.UnsignedInt
+  deadline     DateTime? @db.DateTime(0)
+  storytime    BigInt?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id       Int      @id @default(autoincrement()) @db.UnsignedInt
+  name     String   @db.VarChar(500)
+  email    String   @db.VarChar(500)
+  gender   Int      @db.TinyInt
+  nickname String   @db.VarChar(100)
+  address  String   @db.VarChar(100)
+  role     String?  @db.VarChar(500)
+  is_login Boolean? @default(false)
+  token    String?  @db.VarChar(100)
+  password String   @db.VarChar(500)
+}
