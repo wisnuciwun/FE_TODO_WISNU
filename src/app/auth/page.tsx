@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -35,11 +36,18 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-center">Login</h2>
+      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg text-center">
+        <div className="flex items-center justify-center">
+          <Image
+            width={200}
+            height={200}
+            src={"/company_logo_full.png"}
+            alt="logo_company"
+          />
+        </div>
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-black">
+            <label className="text-left block text-sm font-medium text-black">
               Email
             </label>
             <input
@@ -52,7 +60,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-black">
+            <label className="text-left block text-sm font-medium text-black">
               Password
             </label>
             <input
@@ -64,12 +72,18 @@ export default function LoginPage() {
               required
             />
           </div>
+          <span className="text-gray-500 text-sm">
+            Need to create account ?{" "}
+            <a className="text-blue-500" href="">
+              Click here
+            </a>
+          </span>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition mt-5"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Logging in..." : "Sign In"}
           </button>
         </form>
       </div>

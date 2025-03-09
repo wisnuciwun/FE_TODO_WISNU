@@ -8,9 +8,11 @@ import FloatingButton from "../components/FloatingButton";
 import Tooltip from "../components/Tooltip";
 import TipOfTheDay from "../components/Tips";
 import { Plus, PlusCircle } from "lucide-react";
+import TodoModal from "../components/TodoModal";
 
 export default function TodoPage() {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
+  const [todoModalOpen, settodoModalOpen] = useState(false);
   const [todos, setTodos] = useState<TodoProps[]>([
     {
       id: 1,
@@ -186,8 +188,17 @@ export default function TodoPage() {
       </div>
 
       <FloatingButton>
-        <Plus />
+        <Plus onClick={() => settodoModalOpen(true)} />
       </FloatingButton>
+      <TodoModal
+        isOpen={todoModalOpen}
+        onClose={() => {
+          settodoModalOpen(false);
+        }}
+        onSave={() => {
+          console.log("msk");
+        }}
+      />
     </div>
   );
 }
