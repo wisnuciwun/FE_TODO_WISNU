@@ -46,12 +46,12 @@ model todos {
 model users {
   id       Int      @id @default(autoincrement()) @db.UnsignedInt
   name     String   @db.VarChar(500)
-  email    String   @db.VarChar(500)
   gender   Int      @db.TinyInt
   nickname String   @db.VarChar(100)
   address  String   @db.VarChar(100)
-  role     String?  @db.VarChar(500)
+  role     Int      @db.UnsignedInt
   is_login Boolean? @default(false)
   token    String?  @db.VarChar(100)
   password String   @db.VarChar(500)
+  email    String   @unique(map: "users_unique") @db.VarChar(500)
 }

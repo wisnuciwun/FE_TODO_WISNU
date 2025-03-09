@@ -2,6 +2,9 @@
   "name": "trelloy",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +14,9 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@prisma/client": "^6.4.1",
+    "bcryptjs": "^3.0.2",
     "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.479.0",
     "next": "15.2.1",
     "react": "^19.0.0",
@@ -24,12 +29,14 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^20",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^20.17.24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-modal": "^3.16.3",
     "prisma": "^6.4.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
   }
 }
