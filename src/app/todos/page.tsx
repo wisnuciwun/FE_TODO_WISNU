@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { TodoProps } from "../types";
+import { useEffect, useState } from "react";
+import {
+  ResponseProps,
+  ResponseTodoProps,
+  ResponseUsersProps,
+  TodoResponse,
+  UserResponse,
+} from "../types";
 import TodoCards from "../components/TodoCard";
 import Image from "next/image";
 import FloatingButton from "../components/FloatingButton";
@@ -9,98 +15,79 @@ import Tooltip from "../components/Tooltip";
 import TipOfTheDay from "../components/Tips";
 import { Plus, PlusCircle } from "lucide-react";
 import TodoModal from "../components/TodoModal";
+import { req } from "../utils/req";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function TodoPage() {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [todoModalOpen, settodoModalOpen] = useState(false);
-  const [todos, setTodos] = useState<TodoProps[]>([
-    {
-      id: 1,
-      title: "Card One",
-      description: "This is the first sample card.",
-      completed: false,
-      author: "Reza",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 2,
-      title: "Card Two",
-      description: "This is the second sample card.",
-      completed: false,
-      author: "Ardi",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 3,
-      title: "Card Three",
-      description: "This is the third sample card.",
-      completed: true,
-      author: "Reza",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 1,
-      title: "Card One",
-      description: "This is the first sample card.",
-      completed: false,
-      author: "Reza",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 2,
-      title: "Card Two",
-      description: "This is the second sample card.",
-      completed: false,
-      author: "Ardi",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 3,
-      title: "Card Three",
-      description: "This is the third sample card.",
-      completed: true,
-      author: "Reza",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 1,
-      title: "Card One",
-      description: "This is the first sample card.",
-      completed: false,
-      author: "Reza",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 2,
-      title: "Card Two",
-      description: "This is the second sample card.",
-      completed: false,
-      author: "Ardi",
-      deadline: "09/03/2025",
-    },
-    {
-      id: 3,
-      title: "Card Three",
-      description: "This is the third sample card.",
-      completed: true,
-      author: "Reza",
-      deadline: "09/03/2025",
-    },
-  ]);
+  const [todos, setTodos] = useState<TodoResponse[]>([]);
+  const [users, setusers] = useState<UserResponse[]>([]);
   const [newTodo, setNewTodo] = useState("");
+  const [loading, setloading] = useState(false);
+  const route = useRouter();
 
-  const handleAddTodo = () => {};
+  const handleAddTodo = (data: any) => {
+    setloading(true);
+    let payload = {
+      title: data.title,
+      description: data.description,
+      storytime: parseInt(data.storytime),
+      deadline: data.deadline,
+      assign_to_id: parseInt(data.assignTo),
+    };
 
-  const handleCompleteTodo = (id: number) => {};
+    try {
+      req("/create-todo", "POST", payload).then((res: ResponseTodoProps) => {
+        if (res.success) {
+          handleGetTodos();
+          settodoModalOpen(false);
+        }
+      });
+    } catch (error) {
+      // todo
+    } finally {
+      setloading(false);
+    }
+  };
 
-  const handleDeleteTodo = (id: number) => {};
+  const handleCompleteTodo = (id: string) => {};
 
-  const handleLogout = () => {};
+  const handleRejectTodo = (id: string) => {};
+
+  const handleLogout = () => {
+    req("/logout", "GET").then((res: ResponseTodoProps) => {
+      if (res.success) {
+        route.push("/auth");
+      }
+    });
+  };
+
+  const handleGetTodos = () => {
+    req("/todos", "GET").then((res: ResponseTodoProps) => {
+      if (res.success) {
+        setTodos(res.data);
+      }
+    });
+  };
+
+  const handleGetUsers = () => {
+    req("/users", "GET").then((res: ResponseUsersProps) => {
+      if (res.success) {
+        setusers(res.data);
+      }
+    });
+  };
+
+  useEffect(() => {
+    handleGetTodos();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="flex justify-between items-center bg-white shadow-md px-6 py-3 border-b">
-        <div className="flex gap-5">
+      <div className="flex flex-col sm:flex-row justify-between items-center bg-white shadow-md px-4 sm:px-6 py-3 gap-3 sm:gap-0">
+        <div className="flex items-center gap-3 sm:gap-5 w-full sm:w-auto">
           <Image
             src="/company_logo.png"
             alt="Company Logo"
@@ -110,10 +97,10 @@ export default function TodoPage() {
           />
           <TipOfTheDay />
         </div>
-        <div className="flex gap-5">
+        <div className="flex items-center gap-3 sm:gap-5 w-full sm:w-auto">
           <input
             type="text"
-            className="border border-gray-300 px-4 py-2 rounded-lg w-85 focus:outline-none focus:ring-2 focus:ring-blue-400 transition placeholder-gray-500 text-gray-900"
+            className="border border-gray-300 px-3 py-2 rounded-lg w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-blue-400 transition placeholder-gray-500 text-gray-900"
             placeholder="Search for a task..."
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
@@ -121,7 +108,7 @@ export default function TodoPage() {
           <div className="relative">
             <button
               onClick={() => setIsOpenDrawer((prev) => !prev)}
-              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition shadow-sm"
+              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg transition shadow-sm"
             >
               <Image
                 src={"/man.png"}
@@ -130,20 +117,20 @@ export default function TodoPage() {
                 height={25}
                 className="rounded-full"
               />
-              {/* <span className="text-sm font-medium">ABDUL SOMAD</span> */}
             </button>
+
             <Tooltip
               position="bottom-right"
               open={isOpenDrawer}
               setOpen={setIsOpenDrawer}
             >
-              <div>
+              <div className="p-4">
                 <div className="text-center">
                   <Image
                     src="/man.png"
                     alt="Profile"
-                    width={25}
-                    height={25}
+                    width={40}
+                    height={40}
                     className="mx-auto rounded-full"
                   />
                   <h2 className="text-lg font-semibold mt-2">ABDUL SOMAD</h2>
@@ -160,6 +147,7 @@ export default function TodoPage() {
           </div>
         </div>
       </div>
+
       <div className="p-6">
         <div className="mt-6 w-full flex justify-center">
           {todos.length === 0 ? (
@@ -167,19 +155,12 @@ export default function TodoPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {todos.map((todo, index) => (
-                <div key={index} className="group relative">
+                <div key={index} className="relative transition-transform">
                   <TodoCards
                     todo={todo}
-                    onDeleteTodo={handleCompleteTodo}
                     onCompleteTodo={handleCompleteTodo}
+                    onRejectTodo={handleRejectTodo}
                   />
-                  {/* Animation for shifting other cards */}
-                  {/* <style jsx>{`
-                    .group:hover ~ .group {
-                      transform: translateX(100px);
-                      transition: transform 0.3s ease-in-out;
-                    }
-                  `}</style> */}
                 </div>
               ))}
             </div>
@@ -188,16 +169,21 @@ export default function TodoPage() {
       </div>
 
       <FloatingButton>
-        <Plus onClick={() => settodoModalOpen(true)} />
+        <Plus
+          onClick={() => {
+            settodoModalOpen(true);
+            handleGetUsers();
+          }}
+        />
       </FloatingButton>
       <TodoModal
+        loading={loading}
+        listUser={users}
         isOpen={todoModalOpen}
         onClose={() => {
           settodoModalOpen(false);
         }}
-        onSave={() => {
-          console.log("msk");
-        }}
+        onSave={handleAddTodo}
       />
     </div>
   );

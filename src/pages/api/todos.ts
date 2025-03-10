@@ -1,16 +1,16 @@
 import prisma from "@/app/utils/prisma";
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
 import { middleware } from "./middleware";
+import { CustomNextApiRequest } from "@/app/types";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "you must use GET" });
-  }
+export default middleware(
+  async (req: CustomNextApiRequest, res: NextApiResponse) => {
+    if (req.method !== "GET") {
+      return res
+        .status(405)
+        .json({ success: false, message: "You must use GET" });
+    }
 
-  middleware(async (req, res: NextApiResponse) => {
     const { title } = req.query;
 
     const data = await prisma.todos.findMany({
@@ -18,14 +18,14 @@ export default async function handler(
     });
 
     let newData = await Promise.all(
-      data.map(async (v, idx) => {
+      data.map(async (v) => {
         const status = await prisma.status.findFirst({
           where: { id: v.status! },
         });
         const author = await prisma.users.findFirst({
           where: { id: v.author_id! },
         });
-        const assingned = await prisma.users.findFirst({
+        const assigned = await prisma.users.findFirstOrThrow({
           where: { id: v.assign_to_id! },
         });
 
@@ -33,7 +33,7 @@ export default async function handler(
           ...v,
           status_name: status ? status.name : "-",
           author_name: author ? author.name : "-",
-          assigned_to: author ? assingned!.name : "-",
+          assigned_to: assigned ? assigned.name : "-",
         };
       })
     );
@@ -47,6 +47,10 @@ export default async function handler(
       storytime: item.storytime?.toString(),
     }));
 
-    res.json(serializedData);
-  });
-}
+    res.json({
+      success: true,
+      message: "Todo listed successfully",
+      data: serializedData,
+    });
+  }
+);

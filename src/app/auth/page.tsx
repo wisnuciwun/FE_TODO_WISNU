@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { req } from "../utils/req";
+import Button from "../components/Button";
+import { toast } from "react-toastify";
+import { ResponseAuthProps } from "../types";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -18,17 +23,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      await req("/auth", "POST", formData).then((res: ResponseAuthProps) => {
+        if (res.success) {
+          toast(res.message);
+          router.push("/todos");
+        } else {
+          toast(res.message);
+        }
       });
-
-      if (!res.ok) throw new Error("Invalid credentials");
-
-      router.push("/dashboard"); // Redirect after successful login
-    } catch (error) {
-      // alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -74,17 +76,13 @@ export default function LoginPage() {
           </div>
           <span className="text-gray-500 text-sm">
             Need to create account ?{" "}
-            <a className="text-blue-500" href="">
+            <a className="text-blue-500" href="/register">
               Click here
             </a>
           </span>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition mt-5"
-          >
-            {loading ? "Logging in..." : "Sign In"}
-          </button>
+          <Button type="submit" loading={loading} className="w-full mt-5">
+            Sign In
+          </Button>
         </form>
       </div>
     </div>

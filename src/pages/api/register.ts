@@ -7,18 +7,24 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "you must use POST" });
+    return res
+      .status(405)
+      .json({ success: false, message: "you must use POST" });
   }
 
   const { name, email, password, gender, nickname, address, role } = req.body;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ error: "all fields are required" });
+    return res
+      .status(400)
+      .json({ success: false, error: "all fields are required" });
   }
 
   const existingUser = await prisma.users.findFirst({ where: { email } });
   if (existingUser) {
-    return res.status(400).json({ error: "email already used" });
+    return res
+      .status(400)
+      .json({ success: false, error: "email already used" });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -37,5 +43,9 @@ export default async function handler(
 
   return res
     .status(201)
-    .json({ message: "user registered successfully", user: newUser });
+    .json({
+      success: true,
+      message: "user registered successfully",
+      user: newUser,
+    });
 }

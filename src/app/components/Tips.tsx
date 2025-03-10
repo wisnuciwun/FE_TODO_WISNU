@@ -17,21 +17,22 @@ const colors = [
 ];
 
 const TipOfTheDay = () => {
-  const [tip, setTip] = useState("");
-  const [bgColor, setBgColor] = useState("");
+  const [index, setIndex] = useState(Math.floor(Math.random() * tips.length));
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * tips.length);
-    setTip(tips[randomIndex]);
-    setBgColor(colors[randomIndex]);
+    const interval = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % tips.length);
+    }, 10000); // Change tip every 10 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   return (
     <div
-      className={`p-2 rounded-lg shadow-md ${bgColor} text-gray-800 animate-fade-in`}
+      className={`p-2 rounded-lg shadow-md ${colors[index]} text-gray-800 transition-all`}
     >
       <span className="text-medium font-semibold mr-3">💡 Tip of the Day</span>
-      <span className="mt-2 text-sm">{tip}</span>
+      <span className="mt-2 text-sm">{tips[index]}</span>
     </div>
   );
 };

@@ -23,7 +23,7 @@ export default async function handler(
       } = req.body;
 
       if (!id || isNaN(Number(id))) {
-        return res.status(400).json({ message: "Invalid ID" });
+        return res.status(400).json({ success: false, message: "Invalid ID" });
       }
 
       const updatedTodo = await prisma.todos.update({
@@ -49,11 +49,12 @@ export default async function handler(
       };
 
       res.status(200).json({
+        success: true,
         message: "todo updated successfully",
         todo: serializedTodo,
       });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ success: false, message: error });
     }
   });
 }
